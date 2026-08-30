@@ -1,0 +1,9 @@
+# EnvEvidence - Environmental Evidence & Intelligence
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://envevidence.com/sitemap.xml
+
+# Crawl delay for AI agents
+Crawl-delay: 1

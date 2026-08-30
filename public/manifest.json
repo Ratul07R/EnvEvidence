@@ -1,0 +1,16 @@
+{
+  "name": "EnvEvidence — Environmental Evidence & Intelligence",
+  "short_name": "EnvEvidence",
+  "description": "Explore the environmental evidence behind every place. Evidence-backed environmental intelligence with transparent sources, confidence levels, provenance, and data gaps.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "ffffff",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
