@@ -44,7 +44,7 @@ function EvidencePageInner() {
       const res = await fetch(`/api/evidence/${encodeURIComponent(id)}`);
       if (res.ok) {
         const json = await res.json();
-        setEvidence(json);
+        setEvidence(json.evidence);
       } else if (res.status === 404) {
         setNotFound(true);
       }
