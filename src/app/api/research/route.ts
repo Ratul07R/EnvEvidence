@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+
+const prisma = new PrismaClient();
 
 const researchSchema = z.object({
   q: z.string().max(200).optional(),
@@ -13,14 +16,30 @@ export async function GET(request: NextRequest) {
       topic: request.nextUrl.searchParams.get('topic') || undefined,
     });
 
-    // In production, can query OpenAlex API:
-    // const response = await fetch(`https://api.openalex.org/works?search=${params.q}&per_page=20`);
+    const research = await prisma.researchItem.findMany({
+      where: {
+        isDemo: false,
+        ...(params.q && {
+          OR: [
+            { title: { contains: params.q, mode: 'insensitive' } },
+            { topic: { contains: params.q, mode: 'insensitive' } },
+            { abstract: { contains: params.q, mode: 'insensitive' } },
+          ],
+        }),
+        ...(params.topic && { topic: params.topic }),
+      },
+      orderBy: { publicationDate: 'desc' },
+      take: 20,
+    });
 
-    return NextResponse.json({ research: [], total: 0 });
+    return NextResponse.json({ research, total: research.length });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
     }
+    console.error('Research API error:', error);
     return NextResponse.json({ error: 'Internal server error', research: [], total: 0 }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

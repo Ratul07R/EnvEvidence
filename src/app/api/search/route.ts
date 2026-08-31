@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+
+const prisma = new PrismaClient();
 
 const searchSchema = z.object({
   q: z.string().min(1).max(200).optional(),
@@ -21,38 +24,82 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [], query: '', total: 0 });
     }
 
+    const query = (params.q || '').toLowerCase();
+    const typeFilter = (!params.type || params.type === 'all') ? undefined : params.type;
     const results: Array<{
-      type: string;
-      title: string;
-      description?: string;
-      slug?: string;
-      id?: string;
-      category?: string;
-      confidence?: string;
-      date?: string;
+      type: string; title: string; description?: string;
+      slug?: string; id?: string; category?: string;
+      confidence?: string; date?: string;
     }> = [];
 
-    // In production, these would query the database.
-    // The platform returns honest empty results when no data exists.
-    const query = (params.q || '').toLowerCase();
+    if (!typeFilter || typeFilter === 'location') {
+      const locations = await prisma.location.findMany({
+        where: {
+          isDemo: false,
+          ...(query ? { OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { nameBn: { contains: query, mode: 'insensitive' } },
+            { country: { contains: query, mode: 'insensitive' } },
+          ]} : {}),
+        },
+        take: 10,
+      });
+      for (const loc of locations) {
+        results.push({ type: 'location', title: loc.name, description: loc.description || undefined, slug: loc.slug });
+      }
+    }
 
-    // If we had database access:
-    // const locations = await db.location.findMany({ where: { ... }, take: 20 });
-    // const evidence = await db.evidenceRecord.findMany({ where: { ... }, take: 20 });
-    // etc.
+    if (!typeFilter || typeFilter === 'evidence') {
+      const evidence = await prisma.evidenceRecord.findMany({
+        where: {
+          isDemo: false,
+          ...(query ? { OR: [
+            { claim: { contains: query, mode: 'insensitive' } },
+            { value: { contains: query, mode: 'insensitive' } },
+          ]} : {}),
+        },
+        take: 10,
+        include: { location: true, category: true },
+      });
+      for (const ev of evidence) {
+        results.push({
+          type: 'evidence', title: ev.claim || ev.value || 'Evidence',
+          description: ev.location?.name, id: ev.id,
+          category: ev.category?.name || undefined,
+          confidence: ev.confidence, date: ev.observationDate?.toISOString(),
+        });
+      }
+    }
 
-    // Currently returns empty results — the platform is honest about data availability.
-    // When real data is ingested via the source pipeline, results will appear here.
+    if (!typeFilter || typeFilter === 'research') {
+      const items = await prisma.researchItem.findMany({
+        where: {
+          isDemo: false,
+          ...(query ? { OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { topic: { contains: query, mode: 'insensitive' } },
+          ]} : {}),
+        },
+        take: 10,
+      });
+      for (const r of items) {
+        results.push({
+          type: 'research', title: r.title,
+          description: r.journal || r.sourceName,
+          id: r.id, category: r.topic || undefined,
+          date: r.publicationDate?.toISOString(),
+        });
+      }
+    }
 
-    return NextResponse.json({
-      results: results.slice(0, 20),
-      query: params.q || '',
-      total: results.length,
-    });
+    return NextResponse.json({ results: results.slice(0, 20), query: params.q || '', total: results.length });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid search parameters', results: [], query: '', total: 0 }, { status: 400 });
     }
+    console.error('Search API error:', error);
     return NextResponse.json({ error: 'Internal server error', results: [], query: '', total: 0 }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

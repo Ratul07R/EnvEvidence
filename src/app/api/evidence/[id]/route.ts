@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
@@ -10,14 +13,16 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid evidence ID', evidence: null }, { status: 400 });
     }
 
-    // In production:
-    // const evidence = await db.evidenceRecord.findUnique({
-    //   where: { id },
-    //   include: { source: true, location: true, parameter: true, category: true },
-    // });
+    const evidence = await prisma.evidenceRecord.findUnique({
+      where: { id },
+      include: { source: true, location: true, parameter: true, category: true },
+    });
 
-    return NextResponse.json({ evidence: null });
-  } catch {
+    return NextResponse.json({ evidence });
+  } catch (error) {
+    console.error('Evidence API error:', error);
     return NextResponse.json({ error: 'Internal server error', evidence: null }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

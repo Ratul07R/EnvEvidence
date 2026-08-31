@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
     const locationId = request.nextUrl.searchParams.get('location');
     const categorySlug = request.nextUrl.searchParams.get('category');
 
-    // In production:
-    // const gaps = await db.dataGap.findMany({
-    //   where: { ...(locationId && { locationId }), ...(categorySlug && { categorySlug }) },
-    // });
+    const gaps = await prisma.dataGap.findMany({
+      where: {
+        isDemo: false,
+        ...(locationId && { locationId }),
+        ...(categorySlug && { categorySlug }),
+      },
+    });
 
-    return NextResponse.json({ gaps: [], total: 0 });
-  } catch {
+    return NextResponse.json({ gaps, total: gaps.length });
+  } catch (error) {
+    console.error('Data Gaps API error:', error);
     return NextResponse.json({ error: 'Internal server error', gaps: [], total: 0 }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
