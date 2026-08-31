@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // MULTILINGUAL SYSTEM — EnvEvidence
 // Architecture: Add new locales here + in LocaleConfig
 // Translation must not alter scientific meaning.
@@ -7,6 +7,7 @@
 // ============================================================
 
 import type { Locale } from './types';
+export type { Locale } from './types';
 
 export const locales: Locale[] = ['en', 'bn', 'zh', 'ja', 'ar', 'ru'];
 

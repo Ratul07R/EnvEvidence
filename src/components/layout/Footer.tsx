@@ -1,3 +1,4 @@
+"use client";
 import Link from 'next/link';
 import { t, localeConfig, type Locale } from '@/lib/i18n';
 import { useState } from 'react';
