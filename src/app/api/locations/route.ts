@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+
+const prisma = new PrismaClient();
 
 const locationsSchema = z.object({
   slug: z.string().max(100).optional(),
@@ -15,21 +18,48 @@ export async function GET(request: NextRequest) {
       type: request.nextUrl.searchParams.get('type') || undefined,
     });
 
-    // In production, queries the database:
-    // const locations = await db.location.findMany({
-    //   where: { ...(params.slug && { slug: params.slug }), ... },
-    //   include: { evidenceRecords: true, dataGaps: true },
-    // });
-
     if (params.slug) {
-      return NextResponse.json({ location: null, evidence: [], dataGaps: [], timeline: [], summary: null });
+      const location = await prisma.location.findUnique({
+        where: { slug: params.slug },
+        include: {
+          evidenceRecords: { where: { isDemo: false }, take: 20, orderBy: { observationDate: 'desc' } },
+          dataGaps: { where: { isDemo: false } },
+          timelineEvents: { where: { isDemo: false }, orderBy: { date: 'desc' } },
+          intelligenceSummaries: { where: { isDemo: false }, take: 1 },
+        },
+      });
+
+      if (!location) {
+        return NextResponse.json({ location: null, evidence: [], dataGaps: [], timeline: [], summary: null });
+      }
+
+      return NextResponse.json({
+        location,
+        evidence: location.evidenceRecords,
+        dataGaps: location.dataGaps,
+        timeline: location.timelineEvents,
+        summary: location.intelligenceSummaries[0] || null,
+      });
     }
 
-    return NextResponse.json({ locations: [], total: 0 });
+    const locations = await prisma.location.findMany({
+      where: {
+        ...(params.country && { country: params.country }),
+        ...(params.type && { type: params.type }),
+        isDemo: false,
+      },
+      include: {
+        _count: { select: { evidenceRecords: true } },
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return NextResponse.json({ locations, total: locations.length });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
     }
+    console.error('Locations API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
