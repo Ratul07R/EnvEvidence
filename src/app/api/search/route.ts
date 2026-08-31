@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const typeFilter = (!params.type || params.type === 'all') ? undefined : params.type;
     const results: Array<{
       type: string; title: string; description?: string;
-      slug?: string; id?: string; category?: string;
+      slug?: string; id?: string; category?: string | null;
       confidence?: string; date?: string;
     }> = [];
 
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         results.push({
           type: 'evidence', title: ev.claim || ev.value || 'Evidence',
           description: ev.location?.name, id: ev.id,
-          category: ev.category?.name || undefined,
+          category: ev.category?.name ?? undefined,
           confidence: ev.confidence, date: ev.observationDate?.toISOString(),
         });
       }
@@ -85,8 +85,8 @@ export async function GET(request: NextRequest) {
       for (const r of items) {
         results.push({
           type: 'research', title: r.title,
-          description: r.journal || r.sourceName,
-          id: r.id, category: r.topic || undefined,
+          description: r.journal ?? r.sourceName ?? undefined,
+          id: r.id, category: r.topic ?? undefined,
           date: r.publicationDate?.toISOString(),
         });
       }
