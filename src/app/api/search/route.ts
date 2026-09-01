@@ -5,11 +5,21 @@ import { z } from 'zod';
 const prisma = new PrismaClient();
 
 const searchSchema = z.object({
-  q: z.string().max(200).optional(),
+  q: z.string().min(1).max(200).optional(),
   type: z.enum(['all', 'location', 'evidence', 'research', 'topic']).optional(),
   location: z.string().max(100).optional(),
   category: z.string().max(100).optional(),
 });
+
+const CATEGORY_ALIASES: Record<string, string[]> = {
+  air: ['air', 'air-quality'],
+  water: ['water'],
+  'carbon-climate': ['carbon-climate'],
+  'plastic-microplastic': ['plastic-microplastic'],
+  'chemical-pollution': ['chemical-pollution'],
+  industrial: ['industrial'],
+  research: ['research'],
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,9 +38,29 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const query = (params.q || '').trim();
+    const query = (params.q || '').toLowerCase();
     const typeFilter =
       !params.type || params.type === 'all' ? undefined : params.type;
+
+    let categoryIds: string[] | undefined;
+
+    if (params.category) {
+      const categorySlugs =
+        CATEGORY_ALIASES[params.category] || [params.category];
+
+      const categories = await prisma.environmentalCategory.findMany({
+        where: {
+          slug: {
+            in: categorySlugs,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      categoryIds = categories.map((category) => category.id);
+    }
 
     const results: Array<{
       type: string;
@@ -42,7 +72,6 @@ export async function GET(request: NextRequest) {
       categorySlug?: string | null;
       confidence?: string;
       date?: string;
-      claim?: string | null;
       value?: string | null;
       unit?: string | null;
       location?: {
@@ -55,9 +84,6 @@ export async function GET(request: NextRequest) {
       } | null;
     }> = [];
 
-    /*
-     * LOCATIONS
-     */
     if (!typeFilter || typeFilter === 'location') {
       const locations = await prisma.location.findMany({
         where: {
@@ -88,9 +114,6 @@ export async function GET(request: NextRequest) {
             : {}),
         },
         take: 20,
-        orderBy: {
-          name: 'asc',
-        },
       });
 
       for (const loc of locations) {
@@ -99,55 +122,24 @@ export async function GET(request: NextRequest) {
           title: loc.name,
           description: loc.description || undefined,
           slug: loc.slug,
-          id: loc.id,
         });
       }
     }
 
-    /*
-     * EVIDENCE
-     *
-     * IMPORTANT:
-     * category is filtered through EnvironmentalCategory.slug.
-     * This is what makes /environment/air, /environment/water, etc.
-     * work correctly.
-     */
     if (!typeFilter || typeFilter === 'evidence') {
-      let categoryId: string | undefined;
-
-      if (params.category) {
-        const category = await prisma.environmentalCategory.findUnique({
-          where: {
-            slug: params.category,
-          },
-          select: {
-            id: true,
-          },
-        });
-
-        categoryId = category?.id;
-
-        // If the requested category does not exist,
-        // return no evidence instead of returning unrelated records.
-        if (!categoryId) {
-          return NextResponse.json({
-            results: [],
-            query: params.q || '',
-            total: 0,
-          });
-        }
-      }
-
       const evidence = await prisma.evidenceRecord.findMany({
         where: {
           isDemo: false,
-
-          ...(categoryId
+          qualityStatus: {
+            not: 'invalid',
+          },
+          ...(categoryIds
             ? {
-                categoryId,
+                categoryId: {
+                  in: categoryIds,
+                },
               }
             : {}),
-
           ...(params.location
             ? {
                 location: {
@@ -155,7 +147,6 @@ export async function GET(request: NextRequest) {
                 },
               }
             : {}),
-
           ...(query
             ? {
                 OR: [
@@ -177,23 +168,11 @@ export async function GET(request: NextRequest) {
                       mode: 'insensitive',
                     },
                   },
-                  {
-                    publisher: {
-                      contains: query,
-                      mode: 'insensitive',
-                    },
-                  },
                 ],
               }
             : {}),
-
-          qualityStatus: {
-            not: 'invalid',
-          },
         },
-
         take: 100,
-
         orderBy: [
           {
             observationDate: 'desc',
@@ -202,66 +181,31 @@ export async function GET(request: NextRequest) {
             createdAt: 'desc',
           },
         ],
-
         include: {
-          location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-            },
-          },
-          parameter: {
-            select: {
-              id: true,
-              name: true,
-              unit: true,
-            },
-          },
+          location: true,
+          category: true,
+          parameter: true,
         },
       });
 
       for (const ev of evidence) {
         results.push({
           type: 'evidence',
-          title:
-            ev.claim ||
-            `${ev.parameter?.name || 'Measurement'}: ${ev.value || 'N/A'} ${
-              ev.unit || ''
-            }`.trim(),
-
-          description: ev.location?.name || ev.sourceTitle || undefined,
-
+          title: ev.claim || ev.value || 'Evidence',
+          description: ev.location?.name || undefined,
           id: ev.id,
-
           category: ev.category?.name ?? undefined,
-
           categorySlug: ev.category?.slug ?? undefined,
-
           confidence: ev.confidence,
-
           date: ev.observationDate?.toISOString(),
-
-          claim: ev.claim,
-
           value: ev.value,
-
           unit: ev.unit,
-
           location: ev.location
             ? {
                 name: ev.location.name,
                 slug: ev.location.slug,
               }
             : null,
-
           parameter: ev.parameter
             ? {
                 name: ev.parameter.name,
@@ -272,14 +216,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    /*
-     * RESEARCH
-     */
     if (!typeFilter || typeFilter === 'research') {
       const items = await prisma.researchItem.findMany({
         where: {
           isDemo: false,
-
           ...(query
             ? {
                 OR: [
@@ -295,22 +235,11 @@ export async function GET(request: NextRequest) {
                       mode: 'insensitive',
                     },
                   },
-                  {
-                    abstract: {
-                      contains: query,
-                      mode: 'insensitive',
-                    },
-                  },
                 ],
               }
             : {}),
         },
-
         take: 20,
-
-        orderBy: {
-          publicationDate: 'desc',
-        },
       });
 
       for (const r of items) {
