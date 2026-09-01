@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { runSource } from '@/lib/ingestion/source-runner';
+import { ingestOpenMeteoAirQuality } from '@/lib/ingestion/connectors/open-meteo-air';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -10,14 +11,7 @@ type CronResult =
       sourceId: string;
       sourceName: string;
       success: true;
-      result: {
-        sourceId: string;
-        sourceName: string;
-        recordsFound: number;
-        recordsAdded: number;
-        recordsUpdated: number;
-        recordsRejected: number;
-      };
+      result: unknown;
     }
   | {
       sourceId: string;
@@ -40,11 +34,24 @@ export async function GET(request: Request) {
   }
 
   const startedAt = new Date();
+  const results: CronResult[] = [];
 
   try {
+    const openMeteoResult = await ingestOpenMeteoAirQuality();
+
+    results.push({
+      sourceId: 'open-meteo-air-quality',
+      sourceName: 'Open-Meteo Air Quality',
+      success: true,
+      result: openMeteoResult,
+    });
+
     const sources = await db.source.findMany({
       where: {
         status: 'active',
+        id: {
+          not: 'open-meteo-air-quality',
+        },
       },
       select: {
         id: true,
@@ -54,8 +61,6 @@ export async function GET(request: Request) {
         createdAt: 'asc',
       },
     });
-
-    const results: CronResult[] = [];
 
     for (const source of sources) {
       try {
@@ -84,17 +89,20 @@ export async function GET(request: Request) {
       success: true,
       startedAt,
       completedAt: new Date(),
-      sourcesProcessed: sources.length,
+      sourcesProcessed: results.length,
       results,
     });
   } catch (error) {
     return NextResponse.json(
       {
         success: false,
+        startedAt,
+        completedAt: new Date(),
         error:
           error instanceof Error
             ? error.message
             : 'Cron ingestion failed',
+        results,
       },
       { status: 500 }
     );
