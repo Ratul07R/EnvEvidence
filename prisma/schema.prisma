@@ -1,11 +1,3 @@
-// ============================================================
-// ENVEVIDENCE — DATABASE SCHEMA
-// PostgreSQL (Supabase-compatible)
-// ============================================================
-// Architecture designed for PostgreSQL / Supabase.
-// Never invent environmental data. Data provenance is the foundation.
-// ============================================================
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,35 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================================
-// LOCATIONS
-// ============================================================
-
 model Location {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  nameBn      String?
-  country     String
-  region      String?
-  city        String?
-  district    String?
-  latitude    Float?
-  longitude   Float?
-  type        String   @default("city")
-  parentId    String?
-  parent      Location?  @relation("LocationHierarchy", fields: [parentId], references: [id])
-  children    Location[] @relation("LocationHierarchy")
-  description String?
-  isDemo      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  evidenceRecords      EvidenceRecord[]
-  researchItems        ResearchItem[]
-  dataGaps             DataGap[]
+  id                    String                @id @default(cuid())
+  slug                  String                @unique
+  name                  String
+  nameBn                String?
+  country               String
+  region                String?
+  city                  String?
+  district              String?
+  latitude              Float?
+  longitude             Float?
+  type                  String                @default("city")
+  parentId              String?
+  description           String?
+  isDemo                Boolean               @default(false)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  dataGaps              DataGap[]
+  evidenceRecords       EvidenceRecord[]
   intelligenceSummaries IntelligenceSummary[]
-  timelineEvents       TimelineEvent[]
+  parent                Location?             @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children              Location[]            @relation("LocationHierarchy")
+  researchItems         ResearchItem[]
+  timelineEvents        TimelineEvent[]
 
   @@index([slug])
   @@index([country])
@@ -51,52 +38,42 @@ model Location {
   @@index([isDemo])
 }
 
-// ============================================================
-// ENVIRONMENTAL CATEGORIES & PARAMETERS
-// ============================================================
-
 model EnvironmentalCategory {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  nameBn    String?
-  icon      String?
-  color     String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-
-  parameters      Parameter[]
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  name            String
+  nameBn          String?
+  icon            String?
+  color           String?
+  order           Int              @default(0)
+  createdAt       DateTime         @default(now())
   evidenceRecords EvidenceRecord[]
+  parameters      Parameter[]
 }
 
 model Parameter {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  nameBn      String?
-  unit        String?
-  categoryId  String
-  category    EnvironmentalCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  description String?
-  createdAt   DateTime @default(now())
-
+  id              String                @id @default(cuid())
+  slug            String                @unique
+  name            String
+  nameBn          String?
+  unit            String?
+  categoryId      String
+  description     String?
+  createdAt       DateTime              @default(now())
   evidenceRecords EvidenceRecord[]
+  category        EnvironmentalCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([categoryId])
 }
 
-// ============================================================
-// DATA SOURCES (Source Registry)
-// ============================================================
-
 model Source {
-  id                  String    @id @default(cuid())
+  id                  String           @id @default(cuid())
   name                String
   provider            String?
   url                 String?
   apiEndpoint         String?
   license             String?
-  commercialUse       String?   @default("REQUIRES REVIEW")
+  commercialUse       String?          @default("REQUIRES REVIEW")
   attributionReq      String?
   updateFrequency     String?
   dataCategories      String?
@@ -104,91 +81,62 @@ model Source {
   temporalCoverage    String?
   reliabilityNotes    String?
   ingestionMethod     String?
-  status              String    @default("active")
+  status              String           @default("active")
   lastSuccessfulFetch DateTime?
   nextScheduledUpdate DateTime?
   lastFailureReason   String?
-  errorCount          Int       @default(0)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-
-  evidenceRecords EvidenceRecord[]
-  researchItems   ResearchItem[]
-  updateLogs      UpdateLog[]
+  errorCount          Int              @default(0)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  evidenceRecords     EvidenceRecord[]
+  researchItems       ResearchItem[]
+  updateLogs          UpdateLog[]
 
   @@index([status])
 }
 
-// ============================================================
-// EVIDENCE RECORDS (Core Data with Full Provenance)
-// ============================================================
-
 model EvidenceRecord {
-  id                    String   @id @default(cuid())
-
-  // What was measured/observed
-  value                 String?
-  numericValue          Float?
-  unit                  String?
-  parameterId           String?
-  parameter             Parameter? @relation(fields: [parameterId], references: [id])
-  categoryId            String?
-  category              EnvironmentalCategory? @relation(fields: [categoryId], references: [id])
-
-  // Where
-  locationId            String?
-  location              Location? @relation(fields: [locationId], references: [id])
-  samplingSite          String?
-  latitude              Float?
-  longitude             Float?
-  geographicPrecision   String?
-
-  // When
-  observationDate       DateTime?
-  sourcePublicationDate DateTime?
-  collectionDate        DateTime?
-  retrievalDate         DateTime  @default(now())
-
-  // Source / Provenance
-  sourceId              String?
-  source                Source? @relation(fields: [sourceId], references: [id])
-  sourceTitle           String?
-  sourceUrl             String?
-  doi                   String?
-  originalDatasetUrl    String?
-  publisher             String?
-  originalLanguage      String?  @default("en")
-
-  // Methodology
-  methodology           String?
-  measurementMethod     String?
-
-  // Licensing
-  license               String?
-  commercialUseStatus   String?  @default("REQUIRES REVIEW")
+  id                      String                 @id @default(cuid())
+  value                   String?
+  numericValue            Float?
+  unit                    String?
+  parameterId             String?
+  categoryId              String?
+  locationId              String?
+  samplingSite            String?
+  latitude                Float?
+  longitude               Float?
+  geographicPrecision     String?
+  observationDate         DateTime?
+  sourcePublicationDate   DateTime?
+  collectionDate          DateTime?
+  retrievalDate           DateTime               @default(now())
+  sourceId                String?
+  sourceTitle             String?
+  sourceUrl               String?
+  doi                     String?
+  originalDatasetUrl      String?
+  publisher               String?
+  originalLanguage        String?                @default("en")
+  methodology             String?
+  measurementMethod       String?
+  license                 String?
+  commercialUseStatus     String?                @default("REQUIRES REVIEW")
   attributionRequirements String?
-
-  // Processing
-  processingHistory     String?
-
-  // Confidence & Verification
-  confidence            String   @default("UNVERIFIED")
-  evidenceType          String?
-  verificationStatus    String   @default("pending")
-
-  // Claim / Description
-  claim                 String?
-
-  // Data Quality
-  qualityStatus         String   @default("valid")
-  qualityNotes          String?
-
-  // Demo isolation
-  isDemo                Boolean  @default(false)
-
-  // Timestamps
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  processingHistory       String?
+  confidence              String                 @default("UNVERIFIED")
+  evidenceType            String?
+  verificationStatus      String                 @default("pending")
+  claim                   String?
+  qualityStatus           String                 @default("valid")
+  qualityNotes            String?
+  isDemo                  Boolean                @default(false)
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  category                EnvironmentalCategory? @relation(fields: [categoryId], references: [id])
+  location                Location?              @relation(fields: [locationId], references: [id])
+  parameter               Parameter?             @relation(fields: [parameterId], references: [id])
+  source                  Source?                @relation(fields: [sourceId], references: [id])
 
   @@index([locationId])
   @@index([categoryId])
@@ -199,189 +147,157 @@ model EvidenceRecord {
   @@index([evidenceType])
 }
 
-// ============================================================
-// RESEARCH ITEMS
-// ============================================================
-
 model ResearchItem {
-  id                String    @id @default(cuid())
-  title             String
-  authors           String?
-  publicationDate   DateTime?
-  journal           String?
-  doi               String?   @unique
-  abstract          String?
-  sourceName        String?
-  sourceUrl         String?
-  topic             String?
+  id                  String    @id @default(cuid())
+  title               String
+  authors             String?
+  publicationDate     DateTime?
+  journal             String?
+  doi                 String?   @unique
+  abstract            String?
+  sourceName          String?
+  sourceUrl           String?
+  topic               String?
   geographicRelevance String?
-  language          String?   @default("en")
-  categoryId        String?
-  sourceId          String?
-  source            Source?   @relation(fields: [sourceId], references: [id])
-  locationId        String?
-  location          Location? @relation(fields: [locationId], references: [id])
-  isDemo            Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  language            String?   @default("en")
+  categoryId          String?
+  sourceId            String?
+  locationId          String?
+  isDemo              Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  location            Location? @relation(fields: [locationId], references: [id])
+  source              Source?   @relation(fields: [sourceId], references: [id])
 
   @@index([topic])
   @@index([isDemo])
 }
 
-// ============================================================
-// DATA GAPS
-// ============================================================
-
 model DataGap {
-  id              String   @id @default(cuid())
-  locationId      String?
-  location        Location? @relation(fields: [locationId], references: [id])
-  categorySlug    String?
-  categoryName    String?
-  gapLevel        String?
-  description     String?
-  availability    Boolean  @default(false)
-  recency         String?
-  geographicCoverage String?
-  temporalCoverage   String?
-  parameterCoverage  String?
-  sourceDiversity    String?
+  id                   String    @id @default(cuid())
+  locationId           String?
+  categorySlug         String?
+  categoryName         String?
+  gapLevel             String?
+  description          String?
+  availability         Boolean   @default(false)
+  recency              String?
+  geographicCoverage   String?
+  temporalCoverage     String?
+  parameterCoverage    String?
+  sourceDiversity      String?
   measurementFrequency String?
-  isDemo          Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isDemo               Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  location             Location? @relation(fields: [locationId], references: [id])
 
   @@index([locationId])
   @@index([categorySlug])
   @@index([isDemo])
 }
-
-// ============================================================
-// INTELLIGENCE SUMMARIES
-// ============================================================
 
 model IntelligenceSummary {
-  id              String   @id @default(cuid())
-  locationId      String?
-  location        Location? @relation(fields: [locationId], references: [id])
-  whatWeKnow      String?
-  whatChanged     String?
-  whatMatters     String?
-  whatWeDontKnow  String?
-  evidenceStrength String?
-  sourcesSummary  String?
-  language        String   @default("en")
+  id                       String    @id @default(cuid())
+  locationId               String?
+  whatWeKnow               String?
+  whatChanged              String?
+  whatMatters              String?
+  whatWeDontKnow           String?
+  evidenceStrength         String?
+  sourcesSummary           String?
+  language                 String    @default("en")
   generatedFromEvidenceIds String?
-  isAIGenerated   Boolean  @default(false)
-  isDemo          Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isAIGenerated            Boolean   @default(false)
+  isDemo                   Boolean   @default(false)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  location                 Location? @relation(fields: [locationId], references: [id])
 
   @@index([locationId])
   @@index([isDemo])
 }
 
-// ============================================================
-// TIMELINE EVENTS
-// ============================================================
-
 model TimelineEvent {
-  id              String   @id @default(cuid())
-  locationId      String?
-  location        Location? @relation(fields: [locationId], references: [id])
-  date            DateTime?
-  year            Int?
-  title           String
-  description     String?
-  categorySlug    String?
-  evidenceType    String?
-  sourceUrl       String?
-  sourceName      String?
-  isDemo          Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  id           String    @id @default(cuid())
+  locationId   String?
+  date         DateTime?
+  year         Int?
+  title        String
+  description  String?
+  categorySlug String?
+  evidenceType String?
+  sourceUrl    String?
+  sourceName   String?
+  isDemo       Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  location     Location? @relation(fields: [locationId], references: [id])
 
   @@index([locationId])
   @@index([categorySlug])
   @@index([isDemo])
 }
 
-// ============================================================
-// UPDATE LOGS (Data Ingestion Tracking)
-// ============================================================
-
 model UpdateLog {
-  id              String   @id @default(cuid())
-  sourceId        String?
-  source          Source?  @relation(fields: [sourceId], references: [id])
-  status          String   @default("success")
-  recordsAdded    Int      @default(0)
-  recordsUpdated  Int      @default(0)
-  recordsRejected Int      @default(0)
+  id               String    @id @default(cuid())
+  sourceId         String?
+  status           String    @default("success")
+  recordsAdded     Int       @default(0)
+  recordsUpdated   Int       @default(0)
+  recordsRejected  Int       @default(0)
   validationErrors String?
-  errorMessage    String?
-  startedAt       DateTime @default(now())
-  completedAt     DateTime?
+  errorMessage     String?
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  source           Source?   @relation(fields: [sourceId], references: [id])
 
   @@index([sourceId])
 }
 
-// ============================================================
-// USERS (Extensible Auth)
-// ============================================================
-
 model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  name            String?
-  role            String   @default("viewer")
-  savedLocations  String?
-  savedResearch   String?
-  savedEvidence   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String?
+  role           String   @default("viewer")
+  savedLocations String?
+  savedResearch  String?
+  savedEvidence  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([role])
 }
 
-// ============================================================
-// ORDERS / INQUIRIES
-// ============================================================
-
 model Order {
-  id              String   @id @default(cuid())
-  userId          String?
-  userEmail       String?
-  orderType       String?
-  amount          Float?
-  currency        String?   @default("BDT")
-  paymentStatus   String   @default("pending")
+  id               String   @id @default(cuid())
+  userId           String?
+  userEmail        String?
+  orderType        String?
+  amount           Float?
+  currency         String?  @default("BDT")
+  paymentStatus    String   @default("pending")
   paymentReference String?
-  paymentProof    String?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  paymentProof     String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([paymentStatus])
 }
 
-// ============================================================
-// KNOWLEDGE ARTICLES
-// ============================================================
-
 model KnowledgeArticle {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  title           String
-  titleBn         String?
-  content         String?
-  categoryId      String?
+  id                   String   @id @default(cuid())
+  slug                 String   @unique
+  title                String
+  titleBn              String?
+  content              String?
+  categoryId           String?
   relatedLocationSlugs String?
-  relatedTopicSlugs   String?
-  language        String   @default("en")
-  isPublished     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  relatedTopicSlugs    String?
+  language             String   @default("en")
+  isPublished          Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   @@index([isPublished])
 }
