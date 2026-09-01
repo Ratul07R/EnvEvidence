@@ -37,15 +37,29 @@ export async function GET(request: Request) {
   const results: CronResult[] = [];
 
   try {
-    const openMeteoResult = await ingestOpenMeteoAirQuality();
+    // 1. Direct Open-Meteo air-quality ingestion
+    try {
+      const openMeteoResult = await ingestOpenMeteoAirQuality();
 
-    results.push({
-      sourceId: 'open-meteo-air-quality',
-      sourceName: 'Open-Meteo Air Quality',
-      success: true,
-      result: openMeteoResult,
-    });
+      results.push({
+        sourceId: 'open-meteo-air-quality',
+        sourceName: 'Open-Meteo Air Quality',
+        success: true,
+        result: openMeteoResult,
+      });
+    } catch (error) {
+      results.push({
+        sourceId: 'open-meteo-air-quality',
+        sourceName: 'Open-Meteo Air Quality',
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Open-Meteo ingestion failed',
+      });
+    }
 
+    // 2. Run all other active registered sources
     const sources = await db.source.findMany({
       where: {
         status: 'active',
@@ -85,11 +99,17 @@ export async function GET(request: Request) {
       }
     }
 
+    const successfulSources = results.filter(
+      (result) => result.success
+    ).length;
+
     return NextResponse.json({
       success: true,
       startedAt,
       completedAt: new Date(),
       sourcesProcessed: results.length,
+      successfulSources,
+      failedSources: results.length - successfulSources,
       results,
     });
   } catch (error) {
