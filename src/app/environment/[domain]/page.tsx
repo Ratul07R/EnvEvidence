@@ -140,7 +140,7 @@ function DomainPageInner() {
           ? json.results
           : [];
 
-        console.log('ENV EVIDENCE API:', json);
+        setEvidence(results);
       } else {
         setEvidence([]);
       }
@@ -187,6 +187,28 @@ function DomainPageInner() {
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       default:
         return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const evidenceTypeColor = (type?: string) => {
+    switch (type) {
+      case 'measured': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+      case 'modeled': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+      case 'estimated': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+      case 'reported': return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400';
+      case 'inferred': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const evidenceTypeLabel = (type?: string) => {
+    switch (type) {
+      case 'measured': return 'Measured';
+      case 'modeled': return 'Modelled';
+      case 'estimated': return 'Estimated';
+      case 'reported': return 'Reported';
+      case 'inferred': return 'Inferred';
+      default: return 'Unknown';
     }
   };
 
@@ -310,6 +332,15 @@ function DomainPageInner() {
                           <h3 className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2">
                             {displayTitle}
                           </h3>
+
+                          {ev.type && (
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] ${evidenceTypeColor(ev.type)}`}
+                            >
+                              {evidenceTypeLabel(ev.type)}
+                            </Badge>
+                          )}
 
                           <Badge
                             variant="outline"

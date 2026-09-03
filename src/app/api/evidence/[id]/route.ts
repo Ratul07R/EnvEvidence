@@ -10,18 +10,42 @@ export async function GET(
   try {
     const { id } = await params;
     if (!id || id.length > 100) {
-      return NextResponse.json({ error: 'Invalid evidence ID', evidence: null }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        error: 'Invalid evidence ID', 
+        evidence: null 
+      }, { status: 400 });
     }
 
     const evidence = await prisma.evidenceRecord.findUnique({
       where: { id },
-      include: { source: true, location: true, parameter: true, category: true },
+      include: { 
+        source: true, 
+        location: true, 
+        parameter: true, 
+        category: true 
+      },
     });
 
-    return NextResponse.json({ evidence });
+    if (!evidence) {
+      return NextResponse.json({ 
+        success: false,
+        error: 'Evidence not found', 
+        evidence: null 
+      }, { status: 404 });
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      evidence 
+    });
   } catch (error) {
     console.error('Evidence API error:', error);
-    return NextResponse.json({ error: 'Internal server error', evidence: null }, { status: 500 });
+    return NextResponse.json({ 
+      success: false,
+      error: 'Internal server error', 
+      evidence: null 
+    }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

@@ -16,10 +16,19 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ gaps, total: gaps.length });
+    return NextResponse.json({ 
+      success: true,
+      gaps, 
+      total: gaps.length 
+    });
   } catch (error) {
     console.error('Data Gaps API error:', error);
-    return NextResponse.json({ error: 'Internal server error', gaps: [], total: 0 }, { status: 500 });
+    return NextResponse.json({ 
+      success: false,
+      error: 'Internal server error', 
+      gaps: [], 
+      total: 0 
+    }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

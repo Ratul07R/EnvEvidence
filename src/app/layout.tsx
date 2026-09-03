@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | EnvEvidence",
   },
   description:
-    "Explore the environmental evidence behind every place. Evidence-backed environmental intelligence with transparent sources, confidence levels, provenance, and data gaps.",
+    "Evidence-backed environmental intelligence platform. Explore real environmental data from reliable sources with transparent provenance, confidence levels, and documented data gaps. Water quality, air quality, climate, and research intelligence.",
   keywords: [
     "environmental intelligence",
     "environmental evidence",
@@ -38,6 +38,8 @@ export const metadata: Metadata = {
     "pollution data",
     "data gaps",
     "environmental research",
+    "climate data",
+    "sustainability data",
   ],
   authors: [{ name: "EnvEvidence" }],
   creator: "EnvEvidence",
@@ -45,23 +47,26 @@ export const metadata: Metadata = {
   openGraph: {
     title: "EnvEvidence — Environmental Evidence & Intelligence",
     description:
-      "Explore the environmental evidence behind every place. Evidence-backed intelligence with full provenance.",
+      "Evidence-backed environmental intelligence with transparent sources, confidence levels, and documented data gaps. Real data for water quality, air quality, climate, and environmental research.",
     type: "website",
     siteName: "EnvEvidence",
     url: siteUrl,
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "EnvEvidence — Environmental Evidence & Intelligence",
     description:
-      "Explore the environmental evidence behind every place with evidence-backed data.",
+      "Evidence-backed environmental intelligence with transparent sources, confidence levels, and documented data gaps.",
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: "/logo.svg",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.svg",
   },
   manifest: "/manifest.json",
 };

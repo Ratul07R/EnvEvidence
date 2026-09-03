@@ -1,15 +1,21 @@
 {
   "name": "EnvEvidence — Environmental Evidence & Intelligence",
   "short_name": "EnvEvidence",
-  "description": "Explore the environmental evidence behind every place. Evidence-backed environmental intelligence with transparent sources, confidence levels, provenance, and data gaps.",
+  "description": "Evidence-backed environmental intelligence platform with transparent sources, confidence levels, and documented data gaps. Real data for water quality, air quality, climate, and environmental research.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "ffffff",
-  "theme_color": "#0f766e",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
   "icons": [
     {
       "src": "/logo.svg",
-      "sizes": "any",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
       "type": "image/svg+xml"
     }
   ]

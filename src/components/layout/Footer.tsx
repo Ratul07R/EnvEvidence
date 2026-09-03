@@ -14,23 +14,31 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border/40 bg-muted/30 mt-auto">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <img src="/logo.svg" alt="" className="h-5 w-5" aria-hidden="true" />
-              <span className="font-semibold text-sm">{t('brand.name', locale)}</span>
+            <div className="flex items-center gap-2 mb-4">
+              <img src="/logo.svg" alt="" className="h-6 w-6" aria-hidden="true" />
+              <span className="font-semibold text-base">{t('brand.name', locale)}</span>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-4">
               {t('brand.tagline', locale)}
             </p>
+            <div className="flex gap-4">
+              <Link href="/sources" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Sources
+              </Link>
+              <Link href="/methodology" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Methodology
+              </Link>
+            </div>
           </div>
 
           {/* Platform */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Platform</h4>
-            <ul className="space-y-2">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Platform</h4>
+            <ul className="space-y-3">
               <li>
                 <Link href="/sources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   {t('nav.sources', locale)}
@@ -51,8 +59,8 @@ export function Footer() {
 
           {/* Intelligence */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Intelligence</h4>
-            <ul className="space-y-2">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Intelligence</h4>
+            <ul className="space-y-3">
               <li>
                 <Link href="/research" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   {t('nav.research', locale)}
@@ -73,19 +81,31 @@ export function Footer() {
 
           {/* Trust */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{t('footer.trust_title', locale)}</h4>
-            <ul className="space-y-2 text-xs text-muted-foreground">
-              <li>{t('footer.every_claim', locale)}</li>
-              <li>{t('footer.provenance', locale)}</li>
-              <li>{t('footer.evidence_inference', locale)}</li>
-              <li>{t('footer.gaps_transparent', locale)}</li>
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">{t('footer.trust_title', locale)}</h4>
+            <ul className="space-y-3 text-xs text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">•</span>
+                <span>{t('footer.every_claim', locale)}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">•</span>
+                <span>{t('footer.provenance', locale)}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">•</span>
+                <span>{t('footer.evidence_inference', locale)}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-0.5">•</span>
+                <span>{t('footer.gaps_transparent', locale)}</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border/40 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-xs text-muted-foreground">{t('footer.copyright', locale)}</p>
-          <p className="text-xs text-muted-foreground">{t('footer.disclaimer', locale)}</p>
+        <div className="mt-8 pt-8 border-t border-border/40 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground text-center sm:text-left">{t('footer.copyright', locale)}</p>
+          <p className="text-xs text-muted-foreground text-center sm:text-right">{t('footer.disclaimer', locale)}</p>
         </div>
       </div>
     </footer>

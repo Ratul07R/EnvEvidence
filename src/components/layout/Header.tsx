@@ -60,8 +60,8 @@ export function Header() {
           className="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
           aria-label={t('nav.explore', locale)}
         >
-          <img src="/logo.svg" alt="" className="h-7 w-7" aria-hidden="true" />
-          <span className="text-lg font-semibold tracking-tight text-foreground">
+          <img src="/logo.svg" alt="" className="h-8 w-8" aria-hidden="true" />
+          <span className="text-lg font-semibold tracking-tight text-foreground hidden sm:block">
             {t('brand.name', locale)}
           </span>
         </Link>
@@ -117,21 +117,21 @@ export function Header() {
 
       {mobileOpen && (
         <nav className="md:hidden border-t border-border/60 bg-background" aria-label="Mobile navigation">
-          <div className="mx-auto max-w-7xl px-4 py-3 space-y-1">
+          <div className="mx-auto max-w-7xl px-4 py-4 space-y-2">
             {NAV_ITEMS.map((item) => (
               <Link key={item.key} href={item.href} onClick={() => setMobileOpen(false)}>
                 <Button
                   variant={isActive(item.href) ? 'secondary' : 'ghost'}
-                  size="sm"
+                  size="lg"
                   className="w-full justify-start"
                 >
                   {t(`nav.${item.key}`, locale)}
                 </Button>
               </Link>
             ))}
-            <div className="pt-2 border-t border-border/40 mt-2">
+            <div className="pt-4 border-t border-border/40 mt-4">
               <Link href="/legal" onClick={() => setMobileOpen(false)}>
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                <Button variant="ghost" size="lg" className="w-full justify-start">
                   {t('nav.legal', locale)}
                 </Button>
               </Link>

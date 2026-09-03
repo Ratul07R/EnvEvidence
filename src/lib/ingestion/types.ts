@@ -16,4 +16,25 @@ export type ExtractedEvidence = {
   publisher?: string;
   methodology?: string;
   confidence: 'HIGH' | 'MEDIUM' | 'LOW' | 'UNVERIFIED';
+  evidenceType?: 'measured' | 'reported' | 'estimated' | 'modeled' | 'inferred';
+  locationSlug?: string;
+  parameterSlug?: string;
+  categorySlug?: string;
+  latitude?: number;
+  longitude?: number;
+};
+
+export type ConnectorResult = {
+  sourceId: string;
+  sourceName: string;
+  recordsAdded: number;
+  recordsUpdated: number;
+  recordsRejected: number;
+  validationErrors?: string[];
+};
+
+export type Connector = {
+  id: string;
+  name: string;
+  ingest: () => Promise<ConnectorResult>;
 };

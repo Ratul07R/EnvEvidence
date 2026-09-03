@@ -22,7 +22,31 @@ export async function GET(request: NextRequest) {
       const location = await prisma.location.findUnique({
         where: { slug: params.slug },
         include: {
-          evidenceRecords: { where: { isDemo: false }, take: 20, orderBy: { observationDate: 'desc' } },
+          evidenceRecords: { 
+            where: { 
+              isDemo: false,
+              qualityStatus: { not: 'invalid' },
+              // Include valid published evidence regardless of verification status
+              OR: [
+                { verificationStatus: 'verified' },
+                { verificationStatus: 'pending' },
+                { 
+                  AND: [
+                    { evidenceType: { in: ['modeled', 'estimated'] } },
+                    { confidence: { in: ['MEDIUM', 'HIGH'] } },
+                    { qualityStatus: 'valid' }
+                  ]
+                }
+              ]
+            }, 
+            take: 20, 
+            orderBy: { observationDate: 'desc' },
+            include: {
+              source: true,
+              parameter: true,
+              category: true,
+            }
+          },
           dataGaps: { where: { isDemo: false } },
           timelineEvents: { where: { isDemo: false }, orderBy: { date: 'desc' } },
           intelligenceSummaries: { where: { isDemo: false }, take: 1 },
@@ -30,10 +54,18 @@ export async function GET(request: NextRequest) {
       });
 
       if (!location) {
-        return NextResponse.json({ location: null, evidence: [], dataGaps: [], timeline: [], summary: null });
+        return NextResponse.json({ 
+          success: false,
+          location: null, 
+          evidence: [], 
+          dataGaps: [], 
+          timeline: [], 
+          summary: null 
+        });
       }
 
       return NextResponse.json({
+        success: true,
         location,
         evidence: location.evidenceRecords,
         dataGaps: location.dataGaps,
@@ -54,12 +86,28 @@ export async function GET(request: NextRequest) {
       orderBy: { name: 'asc' },
     });
 
-    return NextResponse.json({ locations, total: locations.length });
+    return NextResponse.json({ 
+      success: true,
+      locations, 
+      total: locations.length 
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        error: 'Invalid parameters',
+        locations: [],
+        total: 0
+      }, { status: 400 });
     }
     console.error('Locations API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ 
+      success: false,
+      error: 'Internal server error',
+      locations: [],
+      total: 0
+    }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

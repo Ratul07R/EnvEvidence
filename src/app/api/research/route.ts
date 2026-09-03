@@ -32,13 +32,27 @@ export async function GET(request: NextRequest) {
       take: 20,
     });
 
-    return NextResponse.json({ research, total: research.length });
+    return NextResponse.json({ 
+      success: true,
+      research, 
+      total: research.length 
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        error: 'Invalid parameters',
+        research: [],
+        total: 0
+      }, { status: 400 });
     }
     console.error('Research API error:', error);
-    return NextResponse.json({ error: 'Internal server error', research: [], total: 0 }, { status: 500 });
+    return NextResponse.json({ 
+      success: false,
+      error: 'Internal server error',
+      research: [],
+      total: 0
+    }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

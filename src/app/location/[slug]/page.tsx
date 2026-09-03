@@ -89,6 +89,28 @@ function LocationPageInner() {
     }
   };
 
+  const evidenceTypeColor = (type?: string) => {
+    switch (type) {
+      case 'measured': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+      case 'modeled': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+      case 'estimated': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+      case 'reported': return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400';
+      case 'inferred': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const evidenceTypeLabel = (type?: string) => {
+    switch (type) {
+      case 'measured': return 'Measured';
+      case 'modeled': return 'Modelled';
+      case 'estimated': return 'Estimated';
+      case 'reported': return 'Reported';
+      case 'inferred': return 'Inferred';
+      default: return 'Unknown';
+    }
+  };
+
   if (loading) {
     return (
       <article className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -232,6 +254,11 @@ function LocationPageInner() {
                         {ev.claim || `${ev.parameter?.name || 'Measurement'}: ${ev.value || 'N/A'} ${ev.unit || ''}`}
                       </h3>
                       <div className="flex items-center gap-2 shrink-0">
+                        {ev.evidenceType && (
+                          <Badge variant="outline" className={`text-[10px] ${evidenceTypeColor(ev.evidenceType)}`}>
+                            {evidenceTypeLabel(ev.evidenceType)}
+                          </Badge>
+                        )}
                         <Badge variant="outline" className={`text-[10px] ${confidenceColor(ev.confidence)}`}>
                           {t(`confidence.${ev.confidence.toLowerCase()}`, locale)}
                         </Badge>

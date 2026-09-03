@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (!params.q && !params.location && !params.category) {
       return NextResponse.json({
+        success: true,
         results: [],
         query: '',
         total: 0,
@@ -133,6 +134,19 @@ export async function GET(request: NextRequest) {
           qualityStatus: {
             not: 'invalid',
           },
+          // Fix: Include valid published evidence regardless of verification status
+          // Modelled/estimated data with MEDIUM confidence should be visible
+          OR: [
+            { verificationStatus: 'verified' },
+            { verificationStatus: 'pending' },
+            { 
+              AND: [
+                { evidenceType: { in: ['modeled', 'estimated'] } },
+                { confidence: { in: ['MEDIUM', 'HIGH'] } },
+                { qualityStatus: 'valid' }
+              ]
+            }
+          ],
           ...(categoryIds
             ? {
                 categoryId: {
@@ -255,6 +269,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
+      success: true,
       results: results.slice(0, 100),
       query: params.q || '',
       total: results.length,
@@ -263,6 +278,7 @@ export async function GET(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
+          success: false,
           error: 'Invalid search parameters',
           results: [],
           query: '',
@@ -276,6 +292,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
+        success: false,
         error: 'Internal server error',
         results: [],
         query: '',
