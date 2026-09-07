@@ -285,6 +285,25 @@ model Order {
   @@index([paymentStatus])
 }
 
+model Inquiry {
+  id             String   @id @default(cuid())
+  name           String
+  email          String
+  organization   String?
+  serviceType    String?
+  message        String
+  status         String   @default("NEW")
+  statusHistory   String?  // JSON array of status changes
+  emailSent      Boolean  @default(false)
+  emailError     String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
 model KnowledgeArticle {
   id                   String   @id @default(cuid())
   slug                 String   @unique

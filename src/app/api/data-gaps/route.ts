@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       total: gaps.length 
     });
   } catch (error) {
-    console.error('Data Gaps API error:', error);
     return NextResponse.json({ 
       success: false,
       error: 'Internal server error', 

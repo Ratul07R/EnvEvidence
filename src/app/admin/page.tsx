@@ -25,7 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Lock, Database, ShieldCheck, Clock, AlertTriangle, CheckCircle2,
+  Lock, Database, ShieldCheck, Clock, AlertTriangle, CheckCircle2, Mail,
 } from 'lucide-react';
 import type { SourceRegistry } from '@/lib/types';
 
@@ -41,6 +41,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(false);
   const [sources, setSources] = useState<SourceRegistry[]>([]);
+  const [inquiries, setInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
 
@@ -59,15 +60,43 @@ export default function AdminPage() {
     }
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const fetchInquiries = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/inquiries', {
+        headers: {
+          'Authorization': `Bearer ${password}`,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setInquiries(Array.isArray(json.inquiries) ? json.inquiries : []);
+      }
+    } catch {
+      setInquiries([]);
+    }
+  }, [password]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin';
-    if (password === adminPassword) {
-      setAuthenticated(true);
-      setAuthError(false);
-      fetchSources();
-    } else {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setAuthenticated(true);
+        setAuthError(false);
+        fetchSources();
+        fetchInquiries();
+      } else {
+        setAuthError(true);
+      }
+    } catch {
       setAuthError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,6 +111,7 @@ export default function AdminPage() {
 
   const healthyCount = sources.filter((s) => s.status === 'active' || s.status === 'healthy').length;
   const failedCount = sources.filter((s) => s.status === 'error' || s.status === 'failed').length;
+  const newInquiriesCount = inquiries.filter((i) => i.status === 'NEW').length;
 
   // Auth Gate
   if (!authenticated) {
@@ -178,12 +208,12 @@ export default function AdminPage() {
 
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-primary" />
+            <div className="h-9 w-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Mail className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">{t('admin.freshness', locale)}</p>
-              <p className="text-lg font-bold">{t('admin.monitoring', locale)}</p>
+              <p className="text-xs text-muted-foreground">New Inquiries</p>
+              <p className="text-lg font-bold text-blue-600">{newInquiriesCount}</p>
             </div>
           </CardContent>
         </Card>
@@ -271,7 +301,7 @@ export default function AdminPage() {
       </section>
 
       {/* Ingestion Logs */}
-      <section>
+      <section className="mb-8">
         <h2 className="text-lg font-semibold mb-4">{t('admin.ingestion', locale)}</h2>
         <Card>
           <CardContent className="p-6 text-center">
@@ -279,6 +309,54 @@ export default function AdminPage() {
             <p className="text-sm text-muted-foreground">{t('admin.monitoring', locale)}</p>
           </CardContent>
         </Card>
+      </section>
+
+      {/* Professional Inquiries */}
+      <section>
+        <h2 className="text-lg font-semibold mb-4">Professional Inquiries</h2>
+        {inquiries.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <ShieldCheck className="mx-auto h-8 w-8 text-muted-foreground/40 mb-3" />
+              <p className="text-sm text-muted-foreground">No inquiries received yet</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Organization</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {inquiries.map((inq) => (
+                    <TableRow key={inq.id}>
+                      <TableCell className="font-medium text-sm">{inq.name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{inq.email}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{inq.organization || '—'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{inq.serviceType || '—'}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-[10px]">
+                          {inq.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(inq.createdAt).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
       </section>
     </article>
   );

@@ -10,7 +10,7 @@ import Link from 'next/link';
 import {
   Droplets, Wind, Leaf, Recycle, FlaskConical, Factory,
   BookOpen, Search, ArrowRight, CheckCircle2, Shield, Globe, Layers,
-  TrendingUp, Database, Zap,
+  TrendingUp, Database, Zap, MapPin, BarChart3,
 } from 'lucide-react';
 
 const DOMAINS = [
@@ -46,23 +46,23 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-24 md:pt-32 md:pb-32 relative">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-28 md:pt-36 md:pb-36 relative">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
               <Zap className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Environmental Intelligence Platform</span>
+              <span className="text-sm font-medium text-primary">Environmental Evidence & Intelligence</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight mb-6">
-              {t('brand.name', locale)}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-tight mb-6">
+              EnvEvidence
             </h1>
             
-            <p className="text-xl md:text-2xl text-foreground/90 font-semibold mb-4">
-              {t('home.hero.title', locale)}
+            <p className="text-2xl md:text-3xl text-foreground/90 font-semibold mb-4">
+              Environmental Evidence + Intelligence
             </p>
             
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
-              {t('home.hero.subtitle', locale)}
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-12">
+              Evidence-backed environmental intelligence with transparent sources, confidence levels, provenance, and documented data gaps.
             </p>
 
             {/* Search Box */}
@@ -73,7 +73,7 @@ export default function HomePage() {
                   type="text"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
-                  placeholder={t('home.search.placeholder', locale)}
+                  placeholder="Search environmental evidence, locations, research..."
                   className="h-14 pl-14 pr-32 text-base rounded-2xl border-0 bg-transparent focus-visible:ring-0"
                   aria-label="Search environmental intelligence"
                 />
@@ -81,24 +81,24 @@ export default function HomePage() {
                   type="submit"
                   className="absolute right-2 h-10 px-6 rounded-xl"
                 >
-                  {t('home.search.button', locale)}
+                  Search
                 </Button>
               </div>
             </form>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-12">
+            <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mt-16">
               <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">7</div>
-                <div className="text-xs text-muted-foreground">Environmental Domains</div>
+                <div className="text-3xl font-bold text-foreground">7</div>
+                <div className="text-sm text-muted-foreground">Environmental Domains</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">Real</div>
-                <div className="text-xs text-muted-foreground">Public Sources</div>
+                <div className="text-3xl font-bold text-foreground">Real</div>
+                <div className="text-sm text-muted-foreground">Public Sources</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">6</div>
-                <div className="text-xs text-muted-foreground">Languages</div>
+                <div className="text-3xl font-bold text-foreground">6</div>
+                <div className="text-sm text-muted-foreground">Languages</div>
               </div>
             </div>
           </div>
@@ -106,14 +106,14 @@ export default function HomePage() {
       </section>
 
       {/* Environmental Intelligence Domains */}
-      <section className="py-20 bg-background">
+      <section className="py-24 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              {t('home.domains.title', locale)}
+              Environmental Intelligence Domains
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t('home.domains.subtitle', locale)}
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Explore evidence-backed data across environmental domains
             </p>
           </div>
           
@@ -148,12 +148,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="py-20 bg-muted/30">
+      {/* Evidence-First Principles */}
+      <section className="py-24 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              {t('home.trust.title', locale)}
+              Evidence-First Principles
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Built on principles of transparency, provenance, and scientific integrity
@@ -183,8 +183,46 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Platform Capabilities */}
+      <section className="py-24 bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+              Platform Capabilities
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Professional environmental intelligence for research, compliance, and decision-making
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <MapPin className="mx-auto h-10 w-10 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Location Intelligence</h3>
+                <p className="text-sm text-muted-foreground">Environmental evidence for specific locations with historical context and trends</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 text-center">
+                <BarChart3 className="mx-auto h-10 w-10 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Evidence Analytics</h3>
+                <p className="text-sm text-muted-foreground">Statistical analysis and confidence assessment of environmental measurements</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 text-center">
+                <BookOpen className="mx-auto h-10 w-10 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Research Discovery</h3>
+                <p className="text-sm text-muted-foreground">Environmental research intelligence with open access metadata and citations</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Professional CTA */}
-      <section className="py-20 bg-background">
+      <section className="py-24 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/5 to-primary/10 p-8 md:p-16 text-center">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-4">{t('professional.title', locale)}</h2>

@@ -33,6 +33,7 @@ function ResearchPageInner() {
   });
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<ResearchItem[]>([]);
+  const [recentResearch, setRecentResearch] = useState<ResearchItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(!!initialQuery);
 
@@ -60,11 +61,30 @@ function ResearchPageInner() {
     }
   }, []);
 
+  const fetchRecentResearch = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/research');
+      if (res.ok) {
+        const json = await res.json();
+        const items = Array.isArray(json) ? json : json.results || json.items || [];
+        setRecentResearch(items.slice(0, 6)); // Show recent papers
+      }
+    } catch {
+      setRecentResearch([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
+    // Load recent research on initial load
+    fetchRecentResearch();
+    // If there's a search query, also load search results
     if (initialQuery) {
       fetchResearch(initialQuery);
     }
-  }, [initialQuery, fetchResearch]);
+  }, [initialQuery, fetchResearch, fetchRecentResearch]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -110,26 +130,12 @@ function ResearchPageInner() {
         </div>
       </form>
 
-      {/* Results */}
-      {loading && (
-        <div className="grid gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}><CardContent className="p-4"><Skeleton className="h-5 w-3/4" /><Skeleton className="h-4 w-1/2 mt-3" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent></Card>
-          ))}
-        </div>
-      )}
-
-      {!loading && searched && results.length === 0 && (
-        <section className="text-center py-16">
-          <BookOpen className="mx-auto h-10 w-10 text-muted-foreground/40 mb-4" />
-          <h2 className="text-lg font-medium text-muted-foreground">{t('research.no_results', locale)}</h2>
-        </section>
-      )}
-
-      {!loading && results.length > 0 && (
-        <section>
+      {/* Recent Research */}
+      {!searched && recentResearch.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4">Recent Environmental Research</h2>
           <div className="grid gap-4">
-            {results.map((item) => (
+            {recentResearch.map((item) => (
               <article key={item.id}>
                 <Card className="transition-colors hover:border-primary/30 hover:shadow-sm">
                   <CardContent className="p-5">
@@ -148,7 +154,7 @@ function ResearchPageInner() {
                       {item.authors && item.authors.length > 0 && (
                         <span className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
-                          {item.authors.join(', ')}
+                          {item.authors}
                         </span>
                       )}
                       {item.journal && (
@@ -184,7 +190,7 @@ function ResearchPageInner() {
                           rel="noopener noreferrer"
                           className="text-xs text-primary hover:underline inline-flex items-center gap-1"
                         >
-                          {t('research.view_paper', locale)}
+                          View Paper
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
@@ -197,7 +203,95 @@ function ResearchPageInner() {
         </section>
       )}
 
-      {!loading && !searched && (
+      {/* Results */}
+      {loading && (
+        <div className="grid gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}><CardContent className="p-4"><Skeleton className="h-5 w-3/4" /><Skeleton className="h-4 w-1/2 mt-3" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent></Card>
+          ))}
+        </div>
+      )}
+
+      {!loading && searched && results.length === 0 && (
+        <section className="text-center py-16">
+          <BookOpen className="mx-auto h-10 w-10 text-muted-foreground/40 mb-4" />
+          <h2 className="text-lg font-medium text-muted-foreground">{t('research.no_results', locale)}</h2>
+        </section>
+      )}
+
+      {!loading && results.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-4">Search Results</h2>
+          <div className="grid gap-4">
+            {results.map((item) => (
+              <article key={item.id}>
+                <Card className="transition-colors hover:border-primary/30 hover:shadow-sm">
+                  <CardContent className="p-5">
+                    <h2 className="font-medium text-sm leading-snug mb-3">
+                      {item.sourceUrl ? (
+                        <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                          {item.title}
+                          <ExternalLink className="inline h-3 w-3 ml-1 text-muted-foreground" />
+                        </a>
+                      ) : (
+                        item.title
+                      )}
+                    </h2>
+
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                      {item.authors && item.authors.length > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          {item.authors}
+                        </span>
+                      )}
+                      {item.journal && (
+                        <span className="flex items-center gap-1">
+                          <Building2 className="h-3 w-3" />
+                          {item.journal}
+                        </span>
+                      )}
+                      {item.publicationDate && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {item.publicationDate}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3 mt-3">
+                      {item.doi && (
+                        <a
+                          href={`https://doi.org/${item.doi}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          DOI: {item.doi}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                      {item.sourceUrl && (
+                        <a
+                          href={item.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          View Paper
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!loading && !searched && recentResearch.length === 0 && (
         <section className="text-center py-16">
           <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
           <p className="text-muted-foreground text-sm">{t('research.subtitle', locale)}</p>

@@ -40,7 +40,6 @@ export async function GET(
       evidence 
     });
   } catch (error) {
-    console.error('Evidence API error:', error);
     return NextResponse.json({ 
       success: false,
       error: 'Internal server error', 

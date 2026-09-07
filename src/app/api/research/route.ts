@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
         total: 0
       }, { status: 400 });
     }
-    console.error('Research API error:', error);
     return NextResponse.json({ 
       success: false,
       error: 'Internal server error',

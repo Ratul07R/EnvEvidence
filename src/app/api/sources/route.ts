@@ -17,7 +17,6 @@ export async function GET() {
       total: sources.length 
     });
   } catch (error) {
-    console.error('Sources API error:', error);
     return NextResponse.json({ 
       success: false,
       error: 'Internal server error', 

@@ -1,15 +1,23 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { runSource } from '@/lib/ingestion/source-runner';
 
-export async function POST(request: Request) {
+const ingestSchema = z.object({
+  password: z.string().min(1).max(100),
+  sourceId: z.string().min(1).max(100),
+});
+
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const sourceId = body?.sourceId;
+    const { password, sourceId } = ingestSchema.parse(body);
 
-    if (!sourceId || typeof sourceId !== 'string') {
+    // Server-side authentication
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword || password !== adminPassword) {
       return NextResponse.json(
-        { error: 'sourceId is required' },
-        { status: 400 }
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
       );
     }
 
@@ -20,6 +28,12 @@ export async function POST(request: Request) {
       result,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request' },
+        { status: 400 }
+      );
+    }
     const message =
       error instanceof Error ? error.message : 'Ingestion failed';
 

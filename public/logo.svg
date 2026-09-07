@@ -1,44 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#0284c7;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="logoGradientDark" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="logoGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#38bdf8;stop-opacity:1" />
     </linearGradient>
   </defs>
   
-  <!-- Background circle -->
-  <circle cx="256" cy="256" r="240" fill="url(#logoGradient)" opacity="0.08"/>
+  <!-- Earth/globe background -->
+  <circle cx="256" cy="256" r="220" fill="url(#logoGrad1)" opacity="0.08"/>
   
-  <!-- Main hexagon representing structured data/network -->
-  <polygon points="256,80 360,140 360,260 256,320 152,260 152,140" fill="url(#logoGradient)" opacity="0.9"/>
+  <!-- Evidence document with structured data -->
+  <rect x="156" y="120" width="200" height="272" rx="12" fill="url(#logoGrad1)" opacity="0.9"/>
   
-  <!-- Inner hexagon -->
-  <polygon points="256,110 335,158 335,254 256,302 177,254 177,158" fill="white" opacity="0.15"/>
+  <!-- Document header -->
+  <rect x="156" y="120" width="200" height="48" rx="12" fill="url(#logoGrad2)" opacity="0.3"/>
   
-  <!-- Data visualization lines -->
-  <line x1="190" y1="200" x2="322" y2="200" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <line x1="190" y1="200" x2="230" y2="160" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
-  <line x1="230" y1="160" x2="280" y2="180" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
-  <line x1="280" y1="180" x2="322" y2="200" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <!-- Header line -->
+  <rect x="176" y="140" width="100" height="8" rx="4" fill="white" opacity="0.9"/>
   
-  <!-- Data points -->
-  <circle cx="190" cy="200" r="8" fill="white"/>
-  <circle cx="230" cy="160" r="6" fill="white" opacity="0.8"/>
-  <circle cx="280" cy="180" r="6" fill="white" opacity="0.8"/>
-  <circle cx="322" cy="200" r="8" fill="white"/>
+  <!-- Data lines representing evidence -->
+  <rect x="176" y="190" width="140" height="6" rx="3" fill="white" opacity="0.7"/>
+  <rect x="176" y="210" width="120" height="6" rx="3" fill="white" opacity="0.6"/>
+  <rect x="176" y="230" width="130" height="6" rx="3" fill="white" opacity="0.6"/>
+  <rect x="176" y="250" width="110" height="6" rx="3" fill="white" opacity="0.5"/>
+  
+  <!-- Graph/chart representation -->
+  <rect x="176" y="280" width="16" height="40" rx="4" fill="white" opacity="0.8"/>
+  <rect x="198" y="300" width="16" height="20" rx="4" fill="white" opacity="0.6"/>
+  <rect x="220" y="290" width="16" height="30" rx="4" fill="white" opacity="0.7"/>
+  <rect x="242" y="270" width="16" height="50" rx="4" fill="white" opacity="0.9"/>
+  <rect x="264" y="295" width="16" height="25" rx="4" fill="white" opacity="0.5"/>
   
   <!-- Verification checkmark -->
-  <path d="M 210 230 L 240 260 L 302 220" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M 200 348 L 240 388 L 312 330" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   
-  <!-- Globe representation -->
-  <ellipse cx="256" cy="356" rx="120" ry="40" stroke="url(#logoGradient)" stroke-width="3" fill="none" opacity="0.6"/>
-  <ellipse cx="256" cy="356" rx="120" ry="40" stroke="url(#logoGradient)" stroke-width="3" fill="none" opacity="0.4" transform="rotate(45 256 356)"/>
-  <ellipse cx="256" cy="356" rx="120" ry="40" stroke="url(#logoGradient)" stroke-width="3" fill="none" opacity="0.4" transform="rotate(90 256 356)"/>
+  <!-- Orbiting data points representing global coverage -->
+  <circle cx="256" cy="256" r="160" stroke="url(#logoGrad1)" stroke-width="2" fill="none" opacity="0.3"/>
+  <circle cx="400" cy="200" r="12" fill="url(#logoGrad2)"/>
+  <circle cx="112" cy="312" r="10" fill="url(#logoGrad2)" opacity="0.8"/>
+  <circle cx="350" cy="350" r="8" fill="url(#logoGrad2)" opacity="0.6"/>
   
   <!-- Brand text -->
-  <text x="256" y="420" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="url(#logoGradient)" letter-spacing="2">ENVEVIDENCE</text>
+  <text x="256" y="445" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="url(#logoGrad1)" letter-spacing="1">ENVEVIDENCE</text>
+  <text x="256" y="470" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="url(#logoGrad1)" opacity="0.7" letter-spacing="2">ENVIRONMENTAL EVIDENCE + INTELLIGENCE</text>
 </svg>

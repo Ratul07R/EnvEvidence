@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
         timeline: []
       }, { status: 400 });
     }
-    console.error('Intelligence API error:', error);
     return NextResponse.json({ 
       success: false,
       error: 'Internal server error',

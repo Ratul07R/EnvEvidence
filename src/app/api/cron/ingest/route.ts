@@ -30,10 +30,15 @@ type CronResult =
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
 
-  if (
-    process.env.CRON_SECRET &&
-    authHeader !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  // CRON_SECRET is required for production security
+  if (!process.env.CRON_SECRET) {
+    return NextResponse.json(
+      { success: false, error: 'Server configuration error' },
+      { status: 500 }
+    );
+  }
+
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json(
       { success: false, error: 'Unauthorized' },
       { status: 401 }
