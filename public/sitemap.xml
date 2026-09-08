@@ -1,86 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://envevidence.com/</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/topics</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/topics</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/environment/water</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/environment/water</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/environment/air</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/environment/air</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/environment/carbon-climate</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/environment/carbon-climate</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/environment/plastic-microplastic</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/environment/plastic-microplastic</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/environment/chemical-pollution</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/environment/chemical-pollution</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/environment/industrial</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/environment/industrial</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/research</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/research</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/sources</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/sources</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/methodology</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/methodology</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/search</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/search</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/professional</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/professional</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://envevidence.com/legal</loc>
-    <lastmod>2026-09-03</lastmod>
+    <loc>https://env-evidence.vercel.app/legal</loc>
+    <lastmod>2026-09-08</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
